@@ -427,7 +427,7 @@ function drawHuman() {
 	}
 }
 
-function checkLives() {
+function checkLives() { // Функция для проверки попадает ли корабль в человечка
 	if (showHuman)
 	{
 		if (shipX + SHIP_W >= humanX && shipX <= humanX + HUMAN_W && shipY + SHIP_H >= humanY && shipY <= humanY)
