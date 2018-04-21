@@ -5,7 +5,7 @@ const LEFT = 37, RIGHT = 39, UP = 38, DOWN = 40, SPACE = 32;
 
 const DROP_H = 20;
 const DROP_W = 10;
-const DROP_SPEED = 20;
+let DROP_SPEED = 20;
 
 const SHIP_W = 170;
 const SHIP_H = 150;
@@ -33,12 +33,16 @@ let enemyX = CANVASW + ENEMY_H;
 let enemyY = CANVASH/2 - ENEMY_H/2;
 
 let enemies = [];
+let enemySpeed = 0;
+let nowEnemies = 0; 
 
 let boom;
 
 let Score = 0;
 
 let left = false, right = false, up = false, down = false, space = false;
+
+let end = false;
 
 window.addEventListener('load', () => {
 	init();
@@ -74,10 +78,15 @@ function init()
 	boom.src = './img/boom';
 
 	let y = 0;
+	let x = 0;
 	for (let i = 0; i < 3; i++) {
 		y = Math.floor(Math.random() * CANVASH) - ENEMY_H;
-		enemies.push({img: new Image(), x: CANVASW + ENEMY_H,  y: y, status: 1});
+		enemySpeed = Math.floor(Math.random() * 7) + 3;
+		x = (CANVASW + ENEMY_H);
+		if (y < 0) y += ENEMY_H;
+		enemies.push({img: new Image(), x: x,  y: y, status: 1, speed: enemySpeed});
 		enemies[enemies.length-1].img.src = "./img/enemy.png";
+		nowEnemies++;
 	}
 
 	document.addEventListener('keydown', (e) => {
@@ -132,32 +141,38 @@ function draw()
 	ctx.clearRect(0, 0, CANVASW, CANVASH);
 	drawDrops(drops);
 	drawShip();
-	drawEnemies();
 	drawScore();
+	if (!end)
+	{
+		drawEnemies();
 
-	if (up && shipY > 0)
-	{
-		shipY -= SHIP_SPEED;
-	}
-	else if (down && shipY < CANVASH - SHIP_H)
-	{
-		shipY += SHIP_SPEED;
-	}
-	else if (right && shipX < CANVASW - SHIP_W)
-	{
-		shipX += SHIP_SPEED;
-	}
-	else if (left && shipX > 0)
-	{
-		shipX -= SHIP_SPEED;
-	}
-	else if (space)
-	{
-		flyBullet();
-	}
+		if (up && shipY > 0)
+		{
+			shipY -= SHIP_SPEED;
+		}
+		else if (down && shipY < CANVASH - SHIP_H)
+		{
+			shipY += SHIP_SPEED;
+		}
+		else if (right && shipX < CANVASW - SHIP_W)
+		{
+			shipX += SHIP_SPEED;
+		}
+		else if (left && shipX > 0)
+		{
+			shipX -= SHIP_SPEED;
+		}
+		else if (space)
+		{
+			flyBullet();
+		}
 
-	enemyX -= 2;
-
+		enemyX -= 2;
+	} 
+	else {
+		gameOver();
+		DROP_SPEED = 5;
+	}
 	requestAnimationFrame(draw);
 }
 
@@ -218,17 +233,21 @@ function flyBullet() {
 function drawEnemies() {
 	ctx.beginPath();
 	let y = 0;
-	if (Score != 0 && (Score % 3 == 0))
+	if (nowEnemies == 0)
 	{
 			y = Math.floor(Math.random() * CANVASH) - ENEMY_H;
-			enemies.push({img: new Image(), x: CANVASW + ENEMY_H,  y: y, status: 1});
+			enemySpeed = Math.floor(Math.random() * 7)  + 3; 
+			if (y < 0) y += ENEMY_H;
+			enemies.push({img: new Image(), x: CANVASW + ENEMY_H,  y: y, status: 1, speed: enemySpeed});
 			enemies[enemies.length-1].img.src = "./img/enemy.png";
+			nowEnemies++;
 	}
 
 	for (let i = 0; i < enemies.length; i++) {
 		if (enemies[i].status != 0)
 			ctx.drawImage(enemies[i].img, enemies[i].x, enemies[i].y, EMENY_W, ENEMY_H);
-		enemies[i].x -= 3;
+		enemies[i].x -= enemies[i].speed;
+		if (enemies[i].x < 0) end = true;
 	}
 	
 	ctx.closePath();
@@ -240,6 +259,7 @@ function colisionDetect() {
 		{
 			enemies[i].status = 0;
 			Score++;
+			nowEnemies--;	
 			return enemies[i];
 		}
 	}
@@ -257,4 +277,11 @@ function drawScore() {
 	ctx.fillStyle = "white";
 	ctx.strokeText("Score: " + Score, 10, 50);
 	ctx.fillText("Score: " + Score, 10, 50);
+}
+
+function gameOver() {
+	ctx.font = "30px Arial";
+	ctx.fillStyle = "red";
+	ctx.strokeText("Game over ", CANVASW/2 - 50, CANVASH/2 - 20);
+	ctx.fillText("Game over ", CANVASW/2 - 50, CANVASH/2 - 20);	
 }
