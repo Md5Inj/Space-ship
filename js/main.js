@@ -22,6 +22,9 @@ const BOOM_H = ENEMY_H + 20;
 const HEART_H = 100;
 const HEART_W = 100;
 
+const HUMAN_W = 40;
+const HUMAN_H = 100;
+
 let canvas, ctx;
 let drops = [];
 
@@ -49,6 +52,9 @@ let lastEnemy = -1;
 let lives = 3;
 let heart;
 
+let human;
+let humanX = 50, humanY = 50;
+let showHuman = 1;
 
 let left = false, right = false, up = false, down = false, space = false, p = false;
 
@@ -90,6 +96,9 @@ function init()
 
 	heart = new Image();
 	heart.src = './img/heart.png';
+
+	human = new Image();
+	human.src = './img/kosm.png';
 
 	let y = 0;
 	let x = 0;
@@ -137,6 +146,7 @@ function init()
 				pause = true;
 			}
 		}
+		checkLives();
 	}, false);
 
 	document.addEventListener('keyup', (e) => {
@@ -165,14 +175,21 @@ function init()
 			p = false;
 		}
 	}, false);
+
+	humanX = Math.floor(Math.random() * CANVASW / 4) + HUMAN_W;
+	humanY = Math.floor(Math.random() * CANVASH) - HUMAN_H;
+	if (humanY < 0) humanY += HUMAN_H;
+
 }
 
 function draw()
 {
 	ctx.clearRect(0, 0, CANVASW, CANVASH);
 	drawDrops(drops);
+	drawHuman();
 	drawShip();
 	drawScore();
+
 	if (!end)
 	{
 		if (!pause)
@@ -316,6 +333,7 @@ function colisionDetect() {
 			{
 				SHIP_SPEED += 3;
 				enemiesHighSpeed += 3;
+				showHuman = 1;
 			}
 			nowEnemies--;	
 			return enemies[i];
@@ -379,4 +397,27 @@ function drawLives() {
 	ctx.strokeText(lives, CANVASW - HEART_W - 40, 90);
 	ctx.fillText(lives, CANVASW - HEART_W - 40, 90);
 	ctx.closePath();
+}
+
+function drawHuman() {
+	if (showHuman)
+	{
+		ctx.beginPath();
+		ctx.drawImage(human, humanX, humanY, HUMAN_W, HUMAN_H);
+		ctx.closePath();
+	}
+}
+
+function checkLives() {
+	if (showHuman)
+	{
+		if (shipX + SHIP_W >= humanX && shipX <= humanX + HUMAN_W && shipY + SHIP_H >= humanY && shipY <= humanY)
+		{
+			lives++;
+			humanX = Math.floor(Math.random() * CANVASW / 2) + HUMAN_W;
+			humanY = Math.floor(Math.random() * CANVASH) - HUMAN_H;
+			if (humanY < 0) humanY += HUMAN_H;
+			showHuman = 0;
+		}
+	}
 }
