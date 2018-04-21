@@ -201,24 +201,43 @@ function draw()
 			{
 				if (space)
 					flyBullet();
+				if (right && shipX < CANVASW - SHIP_W)
+					shipX += SHIP_SPEED;
+				if (left && shipX > 0)
+					shipX -= SHIP_SPEED;
+
 				shipY -= SHIP_SPEED;
 			}
 			else if (down && shipY < CANVASH - SHIP_H)
 			{
 				if (space)
 					flyBullet();
+				if (right && shipX < CANVASW - SHIP_W)
+					shipX += SHIP_SPEED;
+				if (left && shipX > 0)
+					shipX -= SHIP_SPEED;
+
 				shipY += SHIP_SPEED;
 			}
 			else if (right && shipX < CANVASW - SHIP_W)
 			{
 				if (space)
 					flyBullet();
+				if (up && shipY > 0)
+					shipY -= SHIP_SPEED;
+				if (down && shipY < CANVASH - SHIP_H)
+					shipY += SHIP_SPEED;
+
 				shipX += SHIP_SPEED;
 			}
 			else if (left && shipX > 0)
 			{
 				if (space)
 					flyBullet();
+				if (up && shipY > 0)
+					shipY -= SHIP_SPEED;
+				if (down && shipY < CANVASH - SHIP_H)
+					shipY += SHIP_SPEED;
 				shipX -= SHIP_SPEED;
 			}
 			else if (space)
