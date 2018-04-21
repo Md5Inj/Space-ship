@@ -1,5 +1,5 @@
-const CANVASW = 1000;
-const CANVASH = 500;
+const CANVASW = document.documentElement.clientWidth;
+const CANVASH = document.documentElement.clientHeight;
 const CANVAS_BG = 'black';
 const LEFT = 37, RIGHT = 39, UP = 38, DOWN = 40, SPACE = 32;
 
@@ -81,7 +81,7 @@ function init()
 	let x = 0;
 	for (let i = 0; i < 3; i++) {
 		y = Math.floor(Math.random() * CANVASH) - ENEMY_H;
-		enemySpeed = Math.floor(Math.random() * 7) + 3;
+		enemySpeed = Math.floor(Math.random() * 20) + 5;
 		x = (CANVASW + ENEMY_H);
 		if (y < 0) y += ENEMY_H;
 		enemies.push({img: new Image(), x: x,  y: y, status: 1, speed: enemySpeed});
@@ -148,24 +148,33 @@ function draw()
 
 		if (up && shipY > 0)
 		{
+			if (space)
+				flyBullet();
 			shipY -= SHIP_SPEED;
 		}
 		else if (down && shipY < CANVASH - SHIP_H)
 		{
+			if (space)
+				flyBullet();
 			shipY += SHIP_SPEED;
 		}
 		else if (right && shipX < CANVASW - SHIP_W)
 		{
+			if (space)
+				flyBullet();
 			shipX += SHIP_SPEED;
 		}
 		else if (left && shipX > 0)
 		{
+			if (space)
+				flyBullet();
 			shipX -= SHIP_SPEED;
 		}
 		else if (space)
 		{
 			flyBullet();
 		}
+
 
 		enemyX -= 2;
 	} 
@@ -233,10 +242,10 @@ function flyBullet() {
 function drawEnemies() {
 	ctx.beginPath();
 	let y = 0;
-	if (nowEnemies == 0)
+	if (nowEnemies < 3)
 	{
 			y = Math.floor(Math.random() * CANVASH) - ENEMY_H;
-			enemySpeed = Math.floor(Math.random() * 7)  + 3; 
+			enemySpeed = Math.floor(Math.random() * 20)  + 5; 
 			if (y < 0) y += ENEMY_H;
 			enemies.push({img: new Image(), x: CANVASW + ENEMY_H,  y: y, status: 1, speed: enemySpeed});
 			enemies[enemies.length-1].img.src = "./img/enemy.png";
@@ -247,7 +256,7 @@ function drawEnemies() {
 		if (enemies[i].status != 0)
 			ctx.drawImage(enemies[i].img, enemies[i].x, enemies[i].y, EMENY_W, ENEMY_H);
 		enemies[i].x -= enemies[i].speed;
-		if (enemies[i].x < 0) end = true;
+		if (enemies[i].x < 0 && enemies[i].status == 1) end = true;
 	}
 	
 	ctx.closePath();
@@ -280,8 +289,9 @@ function drawScore() {
 }
 
 function gameOver() {
-	ctx.font = "30px Arial";
+	ctx.globalAlpha = 0.5;
+	ctx.font = "50px Arial";
 	ctx.fillStyle = "red";
-	ctx.strokeText("Game over ", CANVASW/2 - 50, CANVASH/2 - 20);
-	ctx.fillText("Game over ", CANVASW/2 - 50, CANVASH/2 - 20);	
+	ctx.strokeText("Game over ", CANVASW/2 - 110, CANVASH/2 - 50);
+	ctx.fillText("Game over ", CANVASW/2 - 110, CANVASH/2 - 50);	
 }
