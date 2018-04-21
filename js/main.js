@@ -19,6 +19,9 @@ const ENEMY_H = 150;
 const BOOM_W = EMENY_W + 20;
 const BOOM_H = ENEMY_H + 20;
 
+const HEART_H = 100;
+const HEART_W = 100;
+
 let canvas, ctx;
 let drops = [];
 
@@ -41,6 +44,11 @@ let boom;
 
 let Score = 0;
 let lastScore = 0;
+let lastEnemy = -1;
+
+let lives = 3;
+let heart;
+
 
 let left = false, right = false, up = false, down = false, space = false, p = false;
 
@@ -79,6 +87,9 @@ function init()
 
 	boom = new Image();
 	boom.src = './img/boom';
+
+	heart = new Image();
+	heart.src = './img/heart.png';
 
 	let y = 0;
 	let x = 0;
@@ -167,6 +178,7 @@ function draw()
 		if (!pause)
 		{
 			drawEnemies();
+			drawLives();
 
 			if (up && shipY > 0)
 			{
@@ -283,7 +295,12 @@ function drawEnemies() {
 		if (enemies[i].status != 0)
 			ctx.drawImage(enemies[i].img, enemies[i].x, enemies[i].y, EMENY_W, ENEMY_H);
 		enemies[i].x -= enemies[i].speed;
-		if (enemies[i].x < 0 && enemies[i].status == 1) end = true;
+		if (enemies[i].x < 0 && enemies[i].status == 1) {
+			if (lives == 1) end = true;
+			enemies[i].status = 0;
+			lives--;
+			nowEnemies--;
+		}
 	}
 	
 	ctx.closePath();
@@ -353,4 +370,13 @@ function drawPause() {
 	ctx.fillStyle = "white";
 	ctx.strokeText("Paused. Press p to continue", CANVASW/2 - 300, CANVASH/2 - 50);
 	ctx.fillText("Paused. Press p to continue", CANVASW/2 - 300, CANVASH/2 - 50);
+}
+
+function drawLives() {
+	ctx.beginPath();
+	ctx.font = "60px Arial";
+	ctx.drawImage(heart, CANVASW - HEART_W - 130, 20, HEART_W, HEART_H);
+	ctx.strokeText(lives, CANVASW - HEART_W - 40, 90);
+	ctx.fillText(lives, CANVASW - HEART_W - 40, 90);
+	ctx.closePath();
 }
