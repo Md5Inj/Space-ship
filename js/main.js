@@ -9,7 +9,7 @@ let DROP_SPEED = 20;
 
 const SHIP_W = 170;
 const SHIP_H = 150;
-const SHIP_SPEED = 10;
+let SHIP_SPEED = 10;
 
 const BULLET_W = 40, BULLET_H = 25;
 
@@ -35,10 +35,12 @@ let enemyY = CANVASH/2 - ENEMY_H/2;
 let enemies = [];
 let enemySpeed = 0;
 let nowEnemies = 0; 
+let enemiesHighSpeed = 20;
 
 let boom;
 
 let Score = 0;
+let lastScore = 0;
 
 let left = false, right = false, up = false, down = false, space = false;
 
@@ -81,7 +83,7 @@ function init()
 	let x = 0;
 	for (let i = 0; i < 3; i++) {
 		y = Math.floor(Math.random() * CANVASH) - ENEMY_H;
-		enemySpeed = Math.floor(Math.random() * 20) + 5;
+		enemySpeed = Math.floor(Math.random() * enemiesHighSpeed) + 5;
 		x = (CANVASW + ENEMY_H);
 		if (y < 0) y += ENEMY_H;
 		enemies.push({img: new Image(), x: x,  y: y, status: 1, speed: enemySpeed});
@@ -245,7 +247,7 @@ function drawEnemies() {
 	if (nowEnemies < 3)
 	{
 			y = Math.floor(Math.random() * CANVASH) - ENEMY_H;
-			enemySpeed = Math.floor(Math.random() * 20)  + 5; 
+			enemySpeed = Math.floor(Math.random() * enemiesHighSpeed)  + 5; 
 			if (y < 0) y += ENEMY_H;
 			enemies.push({img: new Image(), x: CANVASW + ENEMY_H,  y: y, status: 1, speed: enemySpeed});
 			enemies[enemies.length-1].img.src = "./img/enemy.png";
@@ -268,8 +270,14 @@ function colisionDetect() {
 		{
 			enemies[i].status = 0;
 			Score++;
+			if (Score > lastScore && (Score % 20 == 0))
+			{
+				SHIP_SPEED += 3;
+				enemiesHighSpeed += 3;
+			}
 			nowEnemies--;	
 			return enemies[i];
+			lastScore = Score;
 		}
 	}
 	return null;
@@ -294,4 +302,23 @@ function gameOver() {
 	ctx.fillStyle = "red";
 	ctx.strokeText("Game over ", CANVASW/2 - 110, CANVASH/2 - 50);
 	ctx.fillText("Game over ", CANVASW/2 - 110, CANVASH/2 - 50);	
+	if (document.cookie != "")
+	{
+		if ((+document.cookie) < Score)
+		{
+			ctx.fillStyle = "green";
+			ctx.strokeText("New high score!!! ", CANVASW/2 - 110, CANVASH/2 - 100);
+			ctx.fillText("New high score!!! ", CANVASW/2 - 110, CANVASH/2 - 100);
+			document.cookie = Score.toString();
+		} 
+		else {
+			ctx.strokeText("High score: " + document.cookie, CANVASW/2 - 130, CANVASH/2 - 100);
+			ctx.fillText("High score: " + document.cookie, CANVASW/2 - 130, CANVASH/2 - 100);
+		}
+	} else {
+		ctx.fillStyle = "green";
+		ctx.strokeText("New high score!!! ", CANVASW/2 - 130, CANVASH/2 - 100);
+		ctx.fillText("New high score!!! ", CANVASW/2 - 130, CANVASH/2 - 100);
+		document.cookie = Score.toString();		
+	}
 }
