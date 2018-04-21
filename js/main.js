@@ -1,7 +1,7 @@
 const CANVASW = document.documentElement.clientWidth;
 const CANVASH = document.documentElement.clientHeight;
 const CANVAS_BG = 'black';
-const LEFT = 37, RIGHT = 39, UP = 38, DOWN = 40, SPACE = 32;
+const LEFT = 37, RIGHT = 39, UP = 38, DOWN = 40, SPACE = 32, KEYBOARD_P = 80;
 
 const DROP_H = 20;
 const DROP_W = 10;
@@ -42,9 +42,10 @@ let boom;
 let Score = 0;
 let lastScore = 0;
 
-let left = false, right = false, up = false, down = false, space = false;
+let left = false, right = false, up = false, down = false, space = false, p = false;
 
 let end = false;
+let pause = false;
 
 window.addEventListener('load', () => {
 	init();
@@ -111,6 +112,19 @@ function init()
 		else if (e.keyCode == SPACE)
 		{
 			space = true;
+		} 
+		else if (e.keyCode == KEYBOARD_P)
+		{
+			if (pause)
+			{
+				pause = false;
+				DROP_SPEED = 20;
+			}
+			else
+			{
+				p = true;
+				pause = true;
+			}
 		}
 	}, false);
 
@@ -135,6 +149,10 @@ function init()
 		{
 			space = false;
 		}
+		else if (e.keyCode == KEYBOARD_P)
+		{
+			p = false;
+		}
 	}, false);
 }
 
@@ -146,39 +164,44 @@ function draw()
 	drawScore();
 	if (!end)
 	{
-		drawEnemies();
+		if (!pause)
+		{
+			drawEnemies();
 
-		if (up && shipY > 0)
-		{
-			if (space)
+			if (up && shipY > 0)
+			{
+				if (space)
+					flyBullet();
+				shipY -= SHIP_SPEED;
+			}
+			else if (down && shipY < CANVASH - SHIP_H)
+			{
+				if (space)
+					flyBullet();
+				shipY += SHIP_SPEED;
+			}
+			else if (right && shipX < CANVASW - SHIP_W)
+			{
+				if (space)
+					flyBullet();
+				shipX += SHIP_SPEED;
+			}
+			else if (left && shipX > 0)
+			{
+				if (space)
+					flyBullet();
+				shipX -= SHIP_SPEED;
+			}
+			else if (space)
+			{
 				flyBullet();
-			shipY -= SHIP_SPEED;
-		}
-		else if (down && shipY < CANVASH - SHIP_H)
-		{
-			if (space)
-				flyBullet();
-			shipY += SHIP_SPEED;
-		}
-		else if (right && shipX < CANVASW - SHIP_W)
-		{
-			if (space)
-				flyBullet();
-			shipX += SHIP_SPEED;
-		}
-		else if (left && shipX > 0)
-		{
-			if (space)
-				flyBullet();
-			shipX -= SHIP_SPEED;
-		}
-		else if (space)
-		{
-			flyBullet();
-		}
+			}
 
-
-		enemyX -= 2;
+			enemyX -= 2;
+		} else {
+			drawPause();
+			DROP_SPEED = 0;
+		}
 	} 
 	else {
 		gameOver();
@@ -321,4 +344,11 @@ function gameOver() {
 		ctx.fillText("New high score!!! ", CANVASW/2 - 130, CANVASH/2 - 100);
 		document.cookie = Score.toString();		
 	}
+}
+
+function drawPause() {
+	ctx.font = "50px Arial";
+	ctx.fillStyle = "white";
+	ctx.strokeText("Paused. Press p to continue", CANVASW/2 - 300, CANVASH/2 - 50);
+	ctx.fillText("Paused. Press p to continue", CANVASW/2 - 300, CANVASH/2 - 50);
 }
