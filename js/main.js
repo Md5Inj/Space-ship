@@ -206,6 +206,8 @@ function draw()
 	else {
 		gameOver();
 		DROP_SPEED = 5;
+		if (space)
+			location.reload();
 	}
 	requestAnimationFrame(draw);
 }
